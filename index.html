@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Худеем · уведомления</title>
+<style>
+  :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; }
+  body { display:flex; align-items:center; justify-content:center; background: #eef2f4; color: #090909; overflow: hidden; }
+  .screen { position: relative; width: min(100vw, 393px, calc(100dvh * 393 / 844)); aspect-ratio: 393 / 844; height: auto; overflow: hidden; background: radial-gradient(ellipse 112% 65% at 102% 84%, #c8edf6 0%, #dff5f8 31%, rgba(255,255,255,0) 70%), #fff; }
+  .status { position:absolute; z-index:3; top: 17px; left: 0; right: 0; height:22px; font-weight: 600; font-size: 16px; letter-spacing: -.3px; }
+  .time { position:absolute; left: 12%; }
+  .signal { position:absolute; right:8.2%; top:1px; width:78px; height:19px; }
+  .art-window { position:absolute; z-index:1; left:0; top: 0; width:100%; height: min(72%, 520px); overflow:hidden; pointer-events:none; }
+  .visual { position:absolute; inset:0; transform-origin:50% 48%; will-change:transform,opacity; -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 81%,transparent 100%); mask-image:linear-gradient(to bottom,#000 0%,#000 81%,transparent 100%); }
+  .visual > img { display:block; width:100%; height:auto; max-width:none; }
+  .content { position:absolute; z-index:2; left:24px; right:24px; bottom:max(31px, env(safe-area-inset-bottom)); }
+  h1 { margin:0 0 8px; font-size:24px; line-height:1.18; letter-spacing:-.35px; font-weight:650; }
+  p { margin:0 0 15px; font-size:16px; line-height:1.4; letter-spacing:-.1px; font-weight:400; }
+  button { display:block; appearance:none; border:0; padding:0 18px; width:100%; height:48px; border-radius:16px; font:600 16px/24px inherit; font-family:inherit; font-size:16px; font-weight:600; touch-action:manipulation; cursor:pointer; }
+  .primary { position:relative; background:#2b6cfc; color:#fff; transform-origin:center; }
+  .primary:focus-visible, .later:focus-visible { outline:3px solid #142fa1; outline-offset:3px; }
+  .primary {transition:transform 120ms ease-out,background-color 160ms ease-out;}
+  .primary:active { transform:scale(.98); background:#2057dc; }
+  .later { margin-top:8px; background:transparent; color:#2b6cfc; }
+  .indicator { position:absolute; z-index:2; bottom:8px; left:50%; transform:translateX(-50%); width:144px; height:5px; border-radius:8px; background:#111; }
+  .touch { position:absolute; z-index:4; left:70%; top:50%; width:68px; height:68px; border:2px solid #fff; background:rgba(212,237,255,.18); box-shadow:0 0 0 4px rgba(212,237,255,.22); border-radius:50%; transform:translate(-50%,-50%) scale(.7); opacity:0; pointer-events:none; }
+  @media (prefers-reduced-motion: reduce) { .visual, .primary { transform:none!important; opacity:1!important; } .touch { display:none; } }
+  @media (max-height:640px) { .content { bottom:24px; } h1 { font-size:22px; } p { font-size:14px; line-height:1.35; margin-bottom:10px; }  button { height:44px; } }
+
+.visual { mask-image:none; -webkit-mask-image:none; }
+.art-window {mask-image:linear-gradient(to bottom,#000 0%,#000 80%,transparent 100%);}
+.scene {position:relative;width:100%;aspect-ratio:3/4;}
+.base {position:absolute;inset:0;width:100%;mask-image:linear-gradient(to bottom,transparent 0%,transparent 60.5%,#000 64%,#000 78%,transparent 82%);}
+.clouds{position:absolute;inset:0;width:100%;mask-image:linear-gradient(to bottom,transparent 0%,transparent 78%,#000 82%,#000 89%,transparent 100%);will-change:transform;}
+.hand {position:absolute;left:12.2%;top:27%;width:61%;height:34%;object-fit:contain;object-position:center;z-index:3;transform-origin:78% 85%;will-change:transform;}
+.coin {position:absolute;left:54%;top:48.8%;width:14.7%;aspect-ratio:1;line-height:0;z-index:2;will-change:transform;filter:drop-shadow(0 6px 9px #20ca9b50);}
+.coin svg {display:block;width:100%;height:100%;overflow:visible;}
+.decor {position:absolute;border-radius:50%;width:7px;height:7px;background:#58d3c0;left:71%;top:40%;}.decor.two{left:90%;top:51%;background:#ffd85b}.decor.three{left:12%;top:39%;background:#ff8a70}
+.slot-glow{position:absolute;left:61%;top:60%;width:16%;aspect-ratio:1;border-radius:50%;background:#a4f1d5;filter:blur(8px);opacity:0;}
+.primary.done {background:#2b6cfc;}
+.coin{isolation:isolate}.coin .filled{position:absolute;inset:0;opacity:0;border-radius:50%;overflow:hidden;}
+
+.content{bottom:48px;}
+.screen{opacity:0}.ready .screen{opacity:1}
+.screen {width:393px;height:844px;aspect-ratio:auto;flex:none;transform:scale(var(--fit,1));}
+.art-window {top:0;height:520px;overflow:visible;}
+.hero-disc {position:absolute;left:44.2735%;top:329.18px;width:14.70085%;aspect-ratio:1;z-index:5;transform-origin:center;pointer-events:none;filter:drop-shadow(0 8px 12px #2b6cfc22);}
+.empty-third{position:absolute;left:43.8%;top:62.5%;width:15.9%;aspect-ratio:1;z-index:4;background:white;border-radius:50%;pointer-events:none;}
+.empty-third svg{display:block;width:100%;height:100%;border-radius:50%;}
+.hero-disc svg{width:100%;height:100%;display:block;border-radius:50%;}
+.compare {position:fixed;left:16px;top:16px;z-index:10;display:flex;gap:8px;font:12px -apple-system,sans-serif;}
+.compare a{color:#35516a;text-decoration:none;padding:8px 11px;border-radius:20px;background:#ffffffdd;}
+@media(max-width:600px){.compare{top:auto;bottom:0;left:0;opacity:.7}.compare a{padding:3px 7px;font-size:10px}}
+@media(max-height:640px){.content{bottom:48px}h1{font-size:24px}p{font-size:16px;line-height:1.4;margin-bottom:15px}button{height:48px}}
+</style>
+</head>
+<body>
+<nav class="compare" aria-label="Материалы"><a href="index.html">Повторить ↻</a><a href="notifications-motion.mp4">Видео · 5,8 с</a><a href="notifications-source.zip">Исходник</a></nav><main class="screen">
+  <div class="status" aria-label="Время 20:01">
+    <span class="time">20:01</span>
+    <svg class="signal" viewBox="0 0 78 19" aria-hidden="true"><path d="M1 14h3V9H1zm5 0h3V7H6zm5 0h3V5h-3zm5 0h3V3h-3z" fill="#111"/><path d="M25 6.7c3.7-3.3 9.3-3.3 13 0M27.6 9c2.2-2 5.6-2 7.8 0M30.5 11.5c.65-.6 1.7-.6 2.4 0" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round"/><rect x="46" y="4" width="23" height="11" rx="3" fill="none" stroke="#111" stroke-width="1.3"/><rect x="48" y="6" width="17.5" height="7" rx="1.5" fill="#111"/><path d="M71 7v5" stroke="#777" stroke-width="2" stroke-linecap="round"/></svg>
+  </div>
+  <div class="art-window" aria-hidden="true"><div class="hero-disc"><svg viewBox="518 980 172 172"><defs><clipPath id="heroClip"><circle cx="604" cy="1066" r="86"/></clipPath></defs><image href="illustration.webp" width="1170" height="1560" clip-path="url(#heroClip)"/></svg></div><div class="visual"><div class="scene">
+<img class="base" src="illustration.webp" alt=""><img class="clouds" src="illustration.webp" alt="">
+<div class="empty-third"><svg viewBox="716 955 180 180"><defs><clipPath id="emptyClip"><circle cx="806" cy="1045" r="90"/></clipPath></defs><image href="illustration.webp" width="1170" height="1560" clip-path="url(#emptyClip)"/></svg></div>
+<i class="decor"></i><i class="decor two"></i><i class="decor three"></i><i class="slot-glow"></i>
+<div class="coin"><svg viewBox="0 0 100 100"><defs><radialGradient id="cg" cx="32%" cy="25%" r="85%"><stop stop-color="#effcff"/><stop offset=".6" stop-color="#d4edff"/><stop offset="1" stop-color="#a9d1fa"/></radialGradient><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope=".12"/></feComponentTransfer><feBlend in="SourceGraphic" mode="soft-light"/></filter></defs><circle cx="50" cy="50" r="50" fill="url(#cg)"/><path d="M29 49 44 64 72 32" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><svg class="filled" viewBox="518 980 172 172"><defs><clipPath id="disc"><circle cx="604" cy="1066" r="86"/></clipPath></defs><image href="illustration.webp" width="1170" height="1560" clip-path="url(#disc)"/></svg></div>
+<img class="hand" src="hand.webp" alt="">
+</div></div></div>
+  <section class="content" aria-labelledby="title">
+    <h1 id="title">Поможем сохранить курс</h1>
+    <p>Итоги недели и рекомендации будут приходить, даже когда приложение закрыто. Настройки уведомлений — в профиле</p>
+    <button class="primary" type="button"><span>Подключить</span><i class="touch" aria-hidden="true"></i></button>
+    <button class="later" type="button">Позже</button>
+  </section>
+  <div class="indicator" aria-hidden="true"></div>
+</main>
+<script>
+(()=>{
+const art=document.querySelector('.visual'),hand=document.querySelector('.hand'),coin=document.querySelector('.coin'),btn=document.querySelector('.primary'),later=document.querySelector('.later'),filled=document.querySelector('.filled'),glow=document.querySelector('.slot-glow');
+const hero=document.querySelector('.hero-disc');
+function fit(){document.documentElement.style.setProperty('--fit',Math.min(1,innerWidth/393,innerHeight/844));}fit();addEventListener('resize',fit);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+let start=performance.now(),wanted=0,progress=0,locked=false,retreat=0,capture=false,last=performance.now(),impactAt=-1;
+const clamp=x=>Math.max(0,Math.min(1,x)),ease=x=>1-Math.pow(1-clamp(x),3);
+function render(t,dt=.016,demo=false){
+if(demo){locked=t>=2.25;progress=locked?ease((t-2.47)/.9):0;retreat=locked?ease((t-3.37)/.8):0;}
+else {progress+=(wanted-progress)*(1-Math.exp(-dt*6.5));const target=locked&&progress>.98?1:0;retreat+=(target-retreat)*(1-Math.exp(-dt*7));}
+if(reduce.matches&&!demo){progress=wanted;retreat=locked?1:0;}
+const approach=progress,seat=progress;const x=7.37*progress,y=12.55*progress;const ret=retreat;
+const entry=reduce.matches?1:ease((t-.72)/.65);art.style.opacity=entry;art.style.transform='none';
+const landAt=1.48;
+const u=clamp((t-.28)/1.2),unfold=reduce.matches?1:u*u*u*(u*(u*6-15)+10);
+const settle=clamp((t-landAt)/.42);
+const contact=reduce.matches?0:Math.sin(settle*Math.PI*2)*Math.exp(-settle*4);
+const size=1+1.7*(1-unfold);
+hero.style.opacity=reduce.matches?'0':String(ease(t/.2)*(1-ease((t-1.98)/.26)));
+hero.style.transform=`translate(${-7*(1-unfold)}px,${-110*(1-unfold)+contact*1.4}px) scale(${size*(1+contact*.045)},${size*(1-contact*.055)}) rotate(${-18*(1-unfold)}deg)`;
+hero.style.filter=`drop-shadow(0 ${8*(1-unfold)+1}px ${12*(1-unfold)+2}px #2b6cfc22)`;
+document.querySelector('.empty-third').style.opacity=reduce.matches?'0':String(1-ease((t-landAt)/.36));
+const idle=reduce.matches?0:Math.sin(t*2*Math.PI/5.6)*1.7*(1-progress);
+const arrival=reduce.matches?1:ease((t-1.05)/.6);const rowArrival=reduce.matches?1:ease((t-.72)/.65);document.querySelector('.base').style.transform='none';
+const parts=document.querySelectorAll('.content h1,.content p,.content button');
+parts.forEach((n,i)=>{const v=reduce.matches?1:ease((t-1.02-i*.085)/.55);n.style.opacity=String(v);n.style.translate=`0 ${(1-v)*7}px`;});
+document.querySelectorAll('.decor').forEach((n,i)=>{const v=reduce.matches?0:Math.sin(t*2*Math.PI/(6.8+i)+i)*3.5;const dx=reduce.matches?0:Math.sin(t*2*Math.PI/(8.6+i)+i)*1.8;n.style.transform=`translate(${dx}px,${v}px)`;});
+const cloudX=reduce.matches?0:Math.sin(t*2*Math.PI/9)*3;const cloudY=reduce.matches?0:Math.sin(t*2*Math.PI/7.4)*2.5;document.querySelector('.clouds').style.transform=`translate(${cloudX}px,${cloudY}px)`;
+hand.style.transform=reduce.matches?'none':`translate(${x/.61-ret*28-(1-arrival)*10}%,${(y+idle/5.2)/.34-ret*25-(1-arrival)*12}%) rotate(${-2*approach+ret*5}deg)`;hand.style.opacity=String((1-ret)*arrival);coin.style.opacity=String(arrival);
+if(demo)impactAt=t>=3.37?3.37:-1;
+else if(locked&&progress>.97&&impactAt<0)impactAt=t;
+const impactTime=impactAt<0?-1:t-impactAt;
+const recoil=reduce.matches||impactTime<0?0:Math.sin(impactTime*21)*Math.exp(-impactTime*8.5);
+coin.style.transform=`translate(${x/.147-(1-arrival)*41.5}%,${(y+idle/5.2)/(.147*.75)-(1-arrival)*37}%) scale(${(1+.07*seat)*(1-recoil*.075)})`;
+filled.style.opacity=String(ease((seat-.5)/.5));glow.style.opacity=String(seat*(1-seat)*.25);coin.style.filter='drop-shadow(0 4px 6px #266cde25)';btn.setAttribute('aria-pressed',String(locked));
+}
+function tick(now){if(capture)return;render((now-start)/1000,Math.min((now-last)/1000,.05));last=now;requestAnimationFrame(tick)}
+function cancel(){wanted=0;locked=false;impactAt=-1}
+btn.addEventListener('click',()=>{wanted=1;locked=true;impactAt=-1;if(!reduce.matches){
+btn.getAnimations().forEach(a=>a.cancel());
+btn.animate([{transform:'scale(1)',backgroundColor:'#2b6cfc'},{transform:'scale(.93)',backgroundColor:'#2057dc',offset:.14},{transform:'scale(1.015)',backgroundColor:'#2b6cfc',offset:.5},{transform:'scale(1)',backgroundColor:'#2b6cfc'}],{duration:520,easing:'ease-out'});
+const tap=document.querySelector('.touch');tap.getAnimations().forEach(a=>a.cancel());
+tap.animate([{opacity:.9,transform:'translate(-50%,-50%) scale(.82)'},{opacity:.8,transform:'translate(-50%,-50%) scale(1.08)',offset:.4},{opacity:0,transform:'translate(-50%,-50%) scale(1.3)'}],{duration:600,easing:'ease-out'});
+}});later.addEventListener('click',cancel);document.addEventListener('keydown',e=>{if(e.key==='r')cancel()});
+window.__capture=t=>{document.body.classList.add('ready');capture=true;document.querySelector('.compare').style.display='none';
+btn.style.transition='none';
+const clickTime=t-2.25;
+const press=clickTime<0?0:Math.sin(clickTime*22)*Math.exp(-clickTime*8);
+btn.style.transform=`scale(${1-.085*press})`;
+const shade=Math.max(0,press);btn.style.backgroundColor=`rgb(${43-11*shade},${108-23*shade},${252-25*shade})`;
+const tap=document.querySelector('.touch');
+const tapIn=t>=2.25?1:0,tapOut=ease((t-2.52)/.44);
+const tapScale=t<2.25?1:.82+.48*ease((t-2.25)/.6);
+tap.style.opacity=String(tapIn*(1-tapOut)*.9);tap.style.transform=`translate(-50%,-50%) scale(${tapScale})`;
+render(t,.016,true)};Promise.all(Array.from(document.images,n=>n.decode().catch(()=>{}))).then(()=>{start=last=performance.now();document.body.classList.add('ready');requestAnimationFrame(tick)});
+})();
+</script></body></html>
