@@ -121,8 +121,6 @@ function cancel(){wanted=0;locked=false;impactAt=-1}
 btn.addEventListener('click',()=>{wanted=1;locked=true;impactAt=-1;if(!reduce.matches){
 btn.getAnimations().forEach(a=>a.cancel());
 btn.animate([{transform:'scale(1)',backgroundColor:'#2b6cfc'},{transform:'scale(.93)',backgroundColor:'#2057dc',offset:.14},{transform:'scale(1.015)',backgroundColor:'#2b6cfc',offset:.5},{transform:'scale(1)',backgroundColor:'#2b6cfc'}],{duration:520,easing:'ease-out'});
-const tap=document.querySelector('.touch');tap.getAnimations().forEach(a=>a.cancel());
-tap.animate([{opacity:.9,transform:'translate(-50%,-50%) scale(.82)'},{opacity:.8,transform:'translate(-50%,-50%) scale(1.08)',offset:.4},{opacity:0,transform:'translate(-50%,-50%) scale(1.3)'}],{duration:600,easing:'ease-out'});
 }});later.addEventListener('click',cancel);document.addEventListener('keydown',e=>{if(e.key==='r')cancel()});
 window.__capture=t=>{document.body.classList.add('ready');capture=true;document.querySelector('.compare').style.display='none';
 btn.style.transition='none';
